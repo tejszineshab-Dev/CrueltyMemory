@@ -1,0 +1,29 @@
+@font-face {
+    font-family: MyFont;
+    src: url(fonts/mingliu.ttc);
+}
+
+body {
+    font-family: MyFont;
+    margin: 80px;
+    color: #00DB00;
+    font-weight:blip ;
+    min-height: 100vh;
+    position: relative;
+    cursor: url("img/cursor/cursor_closed.png");
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url("/img/Divine_Light_Border.webp") no-repeat center;
+    background-size: 100vw 100vh;
+    pointer-events: none;
+}
+
+#header {
+    display: flex;
+    justify-content: center;
+    margin: auto;
+}
