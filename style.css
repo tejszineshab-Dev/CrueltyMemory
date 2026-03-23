@@ -1,23 +1,38 @@
+:root {
+    --green: #00ff00;
+	--purple: #C801AC;
+}
+
 @font-face {
     font-family: MyFont;
     src: url(fonts/mingliu.ttc);
 }
 
+html, body {
+    cursor: url(img/cursor/cursor_open.png), auto;
+    min-height: 100vh;
+}
+
+html:active, body:active {
+    cursor: url(img/cursor/cursor_closed.png), auto;
+}
+
 body {
     font-family: MyFont;
     margin: 80px;
-    color: #00DB00;
+    color: var(--green);
     font-weight:blip ;
     min-height: 100vh;
     position: relative;
-    cursor: url("img/cursor/cursor_closed.png");
+	background-image: url(/img/bg.png);
+  	background-repeat: repeat;
 }
 
 body::before {
     content: "";
     position: fixed;
     inset: 0;
-    background: url("/img/Divine_Light_Border.webp") no-repeat center;
+    background: url(/img/Divine_Light_Border.webp) no-repeat center;
     background-size: 100vw 100vh;
     pointer-events: none;
 }
@@ -26,4 +41,63 @@ body::before {
     display: flex;
     justify-content: center;
     margin: auto;
+	background: radial-gradient(ellipse, rgba(0, 255, 0, 1) 0%, rgba(0, 255, 0, 0) 70%);
+	width: 90vw;
+	border-radius: 50px;
+	color: var(--purple);
+}
+
+#title {
+    font-size: 50px;
+}
+
+#content {
+    margin: auto;
+    justify-content: center;
+    text-align: center;
+	display: none;
+}
+
+#buttons {
+    margin: auto;
+    font-size: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.btn {
+    margin: 10px auto;
+    border: white solid 4px;
+    box-sizing: border-box;
+    width: 50vw;
+	background-color: var(--green);
+	color: white;
+}
+
+.btn-start {
+    margin: 10px auto;
+    box-sizing: border-box;
+    width: 10vw;
+	height: 10vw;
+	filter: saturate(5);
+	transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.btn-start:hover {
+    transform: scale(1.1,1.1);
+	filter: saturate(1);
+}
+
+#player-indicator-div {
+	text-align: center;
+	justify-content: center;
+}
+
+#player-indicator {
+	margin: auto;
+	background-color: var(--purple);
+	color: var(--green);
+	width: 30vw;
+	font-size: 50px;
 }
