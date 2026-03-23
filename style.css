@@ -1,23 +1,38 @@
+:root {
+    --green: #00ff00;
+	--purple: #C801AC;
+}
+
 @font-face {
     font-family: MyFont;
     src: url(fonts/mingliu.ttc);
 }
 
+html, body {
+    cursor: url(img/cursor/cursor_open.png), auto;
+    min-height: 100vh;
+}
+
+html:active, body:active {
+    cursor: url(img/cursor/cursor_closed.png), auto;
+}
+
 body {
     font-family: MyFont;
     margin: 80px;
-    color: #00DB00;
+    color: var(--green);
     font-weight:blip ;
     min-height: 100vh;
     position: relative;
-    cursor: url("img/cursor/cursor_closed.png");
+	background-image: url(/img/bg.png);
+  	background-repeat: repeat;
 }
 
 body::before {
     content: "";
     position: fixed;
     inset: 0;
-    background: url("/img/Divine_Light_Border.webp") no-repeat center;
+    background: url(/img/Divine_Light_Border.webp) no-repeat center;
     background-size: 100vw 100vh;
     pointer-events: none;
 }
@@ -26,4 +41,130 @@ body::before {
     display: flex;
     justify-content: center;
     margin: auto;
+	background: radial-gradient(ellipse, rgba(0, 255, 0, 1) 0%, rgba(0, 255, 0, 0) 70%);
+	width: 90vw;
+	border-radius: 50px;
+	color: var(--purple);
+    transition: transform 0.2s ease;
+}
+
+#header:hover {
+    transform: scale(1.05,1.05);
+}
+
+#title {
+    font-size: 50px;
+}
+
+#content {
+    margin: auto;
+    justify-content: center;
+    text-align: center;
+	display: none;
+}
+
+#buttons {
+    margin: auto;
+    font-size: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.btn {
+    margin: 10px auto;
+    border: white solid 4px;
+    box-sizing: border-box;
+    width: 50vw;
+	background-color: var(--green);
+	color: white;
+}
+
+.btn-start {
+    margin: 10px auto;
+    box-sizing: border-box;
+    width: 10vw;
+	height: 10vw;
+	filter: saturate(5);
+	transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.btn-start:hover {
+    transform: scale(1.1,1.1);
+	filter: saturate(1);
+}
+
+#player-indicator-div {
+	text-align: center;
+	justify-content: center;
+}
+
+#player-indicator {
+	margin: auto;
+	background-color: var(--purple);
+	color: var(--green);
+	width: 30vw;
+	font-size: 50px;
+}
+
+/* --- BOARD --- */
+
+#game-board {
+    display: grid;
+    /* 9 oszlopos rács */
+    grid-template-columns: repeat(9, 1fr); 
+    
+    /* A sorok magasságát is rögzíthetjük 4-re */
+    grid-template-rows: repeat(4, 1fr);
+    
+    gap: 10px;
+    width: 60vw;       /* Szinte a teljes képernyőszélesség */
+    max-width: 1600px; /* Megállítjuk, hogy ne legyen túl nyúlánk nagy monitoron */
+    margin: 20px auto;
+}
+
+.card {
+    /* Fontos, hogy a kártyák megőrizzék a négyzet alakjukat */
+    aspect-ratio: 1 / 1; 
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d; /* Ez engedi, hogy a gyerek elemek 3D-ben mozogjanak */
+}
+
+/* Amikor ezt az osztályt rátesszük JS-sel, megfordul a lap */
+.card.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden; /* Ha a lap "háta" van felénk, legyen láthatatlan */
+    border: 2px solid var(--green);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000;
+}
+
+/* A hátulja (amit alapból látunk) */
+.card-back {
+    z-index: 2; /* Felül van az elején */
+}
+
+/* Az eleje (a számozott kép) */
+.card-front {
+    transform: rotateY(180deg); /* Eleve meg van fordítva, hogy a túloldalon legyen */
+}
+
+.card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
