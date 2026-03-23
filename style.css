@@ -19,13 +19,17 @@ html:active, body:active {
 
 body {
     font-family: MyFont;
-    margin: 80px;
+    margin: 0; /* Vegyük le a fix margót */
+    padding: 20px; /* Paddingot használjunk helyette */
     color: var(--green);
-    font-weight:blip ;
     min-height: 100vh;
-    position: relative;
-	background-image: url(/img/bg.png);
-  	background-repeat: repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-image: url(/img/bg.png);
+    background-repeat: repeat;
+    overflow: hidden; /* Megszünteti a görgetést */
+    box-sizing: border-box;
 }
 
 body::before {
@@ -38,6 +42,8 @@ body::before {
 }
 
 #header {
+    flex-shrink: 0; /* Ne engedje összenyomni a fejlécet */
+    margin-bottom: 20px;
     display: flex;
     justify-content: center;
     margin: auto;
