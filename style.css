@@ -45,6 +45,11 @@ body::before {
 	width: 90vw;
 	border-radius: 50px;
 	color: var(--purple);
+    transition: transform 0.2s ease;
+}
+
+#header:hover {
+    transform: scale(1.05,1.05);
 }
 
 #title {

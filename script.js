@@ -32,9 +32,18 @@ $(document).ready(function () {
             window.alert("Please select a gamemode!")
         }
         else {
+            localStorage.setItem("selected_gamemode", gamemode);
             $("#content").fadeOut(1000, function() {
             window.location.href = "game.html";
             });
         }
+    });
+
+    $("#header").click(function () {
+        let gamemode = "none";
+        localStorage.setItem("selected_gamemode", gamemode);
+        $("#content").fadeOut(1000, function() {
+        window.location.href = "index.html";
+        });
     });
 });
