@@ -1,7 +1,8 @@
 $(document).ready(function () {
     $("#content").fadeIn(1000);
-    let gamemode = "none";
-    $(".btn").hover(function () {
+    let mode = localStorage.getItem("selected_gamemode");
+    if (mode == "none" || mode == null) {
+        $(".btn").hover(function () {
         $(this).animate({
             width: '60vw'
         }, 100);
@@ -38,6 +39,10 @@ $(document).ready(function () {
             });
         }
     });
+    }
+    console.log("Selected gamemode" + mode);
+    let gamemode = "none";
+    
 
     $("#header").click(function () {
         let gamemode = "none";

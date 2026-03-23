@@ -106,3 +106,65 @@ body::before {
 	width: 30vw;
 	font-size: 50px;
 }
+
+/* --- BOARD --- */
+
+#game-board {
+    display: grid;
+    /* 9 oszlopos rács */
+    grid-template-columns: repeat(9, 1fr); 
+    
+    /* A sorok magasságát is rögzíthetjük 4-re */
+    grid-template-rows: repeat(4, 1fr);
+    
+    gap: 10px;
+    width: 60vw;       /* Szinte a teljes képernyőszélesség */
+    max-width: 1600px; /* Megállítjuk, hogy ne legyen túl nyúlánk nagy monitoron */
+    margin: 20px auto;
+}
+
+.card {
+    /* Fontos, hogy a kártyák megőrizzék a négyzet alakjukat */
+    aspect-ratio: 1 / 1; 
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d; /* Ez engedi, hogy a gyerek elemek 3D-ben mozogjanak */
+}
+
+/* Amikor ezt az osztályt rátesszük JS-sel, megfordul a lap */
+.card.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden; /* Ha a lap "háta" van felénk, legyen láthatatlan */
+    border: 2px solid var(--green);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000;
+}
+
+/* A hátulja (amit alapból látunk) */
+.card-back {
+    z-index: 2; /* Felül van az elején */
+}
+
+/* Az eleje (a számozott kép) */
+.card-front {
+    transform: rotateY(180deg); /* Eleve meg van fordítva, hogy a túloldalon legyen */
+}
+
+.card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
