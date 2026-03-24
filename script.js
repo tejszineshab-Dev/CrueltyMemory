@@ -52,168 +52,164 @@ $(document).ready(function () {
     }
 
     function setupGame(gameMode) {
-        const board = $("#game-board");
-        let cards = [];
-        let flippedCards = [];
-        let lockBoard = false;
+    const board = $("#game-board");
+    let cards = [];
+    let flippedCards = [];
+    let lockBoard = false;
+    
+    let timerStarted = false;
+    let seconds = 0;
+    let timerInterval;
+    let matchedPairs = 0;
+    
+    // Módok meghatározása
+    let isMultiplayer = (gameMode === "multi");
+    let isCPU = (gameMode === "cpu");
+    let currentPlayer = 1; // 1 = Játékos, 2 = CPU/Másik Játékos
+    let scores = {1: 0, 2: 0};
+
+    // UI beállítása (Pontok és körök kijelzése)
+    if (isMultiplayer || isCPU) {
+        $("#timer-display").parent().hide();
+        let p2Label = isCPU ? "CPU" : "P2";
         
-        let timerStarted = false;
-        let seconds = 0;
-        let timerInterval;
-        let matchedPairs = 0;
-        
-        // Multiplayer variables
-        let currentPlayer = 1;
-        let scores = {1: 0, 2: 0};
-        let isMultiplayer = (gameMode === "multi");
+        $("#status-container").append(`
+            <div class="status-box" id="turn-box">
+                <p class="status-label">TURN</p>
+                <p id="turn-display" style="margin: 5px 0 0 0; font-size: 28px; color: var(--green); font-weight: bold;">YOU</p>
+            </div>
+            <div class="status-box">
+                <p class="status-label">YOUR SCORE</p>
+                <p id="p1-score" style="margin: 5px 0 0 0; font-size: 28px; color: var(--green); font-weight: bold;">0</p>
+            </div>
+            <div class="status-box">
+                <p class="status-label">${p2Label} SCORE</p>
+                <p id="p2-score" style="margin: 5px 0 0 0; font-size: 28px; color: var(--green); font-weight: bold;">0</p>
+            </div>
+        `);
+    }
 
-        // Setup UI based on mode
-        if (isMultiplayer) {
-            // Hide timer for multiplayer
-            $("#timer-display").parent().hide();
-            
-            // Add turn indicator and scores
-            $("#status-container").append(`
-                <div class="status-box" id="turn-box">
-                    <p class="status-label">TURN</p>
-                    <p id="turn-display" style="margin: 5px 0 0 0; font-size: 28px; color: var(--green); font-weight: bold;">PLAYER 1</p>
+    // Kártyák generálása és keverése (marad az eredeti)
+    for (let i = 1; i <= 18; i++) { cards.push(i, i); }
+    cards.sort(() => Math.random() - 0.5);
+    cards.forEach(num => {
+        const cardHTML = `
+            <div class="card" data-value="${num}">
+                <div class="card-inner">
+                    <div class="card-front"><img src="img/cards/${num}.png"></div>
+                    <div class="card-back"><img src="img/cards/back.png"></div>
                 </div>
-                <div class="status-box">
-                    <p class="status-label">P1 SCORE</p>
-                    <p id="p1-score" style="margin: 5px 0 0 0; font-size: 28px; color: var(--green); font-weight: bold;">0</p>
-                </div>
-                <div class="status-box">
-                    <p class="status-label">P2 SCORE</p>
-                    <p id="p2-score" style="margin: 5px 0 0 0; font-size: 28px; color: var(--green); font-weight: bold;">0</p>
-                </div>
-            `);
-        }
+            </div>`;
+        board.append(cardHTML);
+    });
 
-        // 1. 18 pár generálása (36 kártya)
-        for (let i = 1; i <= 18; i++) {
-            cards.push(i, i);
-        }
+    // Kattintás kezelése
+    board.on("click", ".card", function() {
+        if (lockBoard || $(this).hasClass("flipped")) return;
+        // Ha CPU jön, a játékos nem kattinthat
+        if (isCPU && currentPlayer === 2) return;
 
-        // 2. Keverés
-        cards.sort(() => Math.random() - 0.5);
+        handleFlip($(this));
+    });
 
-        // 3. Kártyák létrehozása
-        cards.forEach(num => {
-            const cardHTML = `
-                <div class="card" data-value="${num}">
-                    <div class="card-inner">
-                        <div class="card-front">
-                            <img src="img/cards/${num}.png" alt="front">
-                        </div>
-                        <div class="card-back">
-                            <img src="img/cards/back.png" alt="back">
-                        </div>
-                    </div>
-                </div>`;
-            board.append(cardHTML);
-        });
+    function handleFlip(cardElement) {
+        cardElement.addClass("flipped");
+        flippedCards.push(cardElement);
 
-        // 4. Kattintás (Fordítás és Logika)
-        board.on("click", ".card", function() {
-            if (lockBoard || $(this).hasClass("flipped")) return;
-
-            // Only start timer for single player modes
-            if (!timerStarted && !isMultiplayer) {
-                timerStarted = true;
-                startTimer();
-            }
-
-            $(this).addClass("flipped");
-            flippedCards.push($(this));
-
-            if (flippedCards.length === 2) {
-                checkForMatch();
-            }
-        });
-
-        function startTimer() {
-            timerInterval = setInterval(() => {
-                seconds++;
-                let mins = Math.floor(seconds / 60);
-                let secs = seconds % 60;
-                $("#timer-display").text(
-                    (mins < 10 ? "0" + mins : mins) + ":" + 
-                    (secs < 10 ? "0" + secs : secs)
-                );
-            }, 1000);
-        }
-
-        function checkForMatch() {
-            let isMatch = flippedCards[0].data("value") === flippedCards[1].data("value");
-
-            if (isMatch) {
-                matchedPairs++;
-                
-                if (isMultiplayer) {
-                    // Award point to current player
-                    scores[currentPlayer]++;
-                    updateScoreboard();
-                    flippedCards = [];
-                    
-                    // Check game end
-                    if (matchedPairs === 18) {
-                        endMultiplayerGame();
-                    }
-                    // Player keeps the turn on successful match
-                } else {
-                    // Single player logic
-                    flippedCards = [];
-                    if (matchedPairs === 18) {
-                        clearInterval(timerInterval);
-                        setTimeout(() => {
-                            alert("MISSION ACCOMPLISHED\nTime: " + $("#timer-display").text());
-                        }, 500);
-                    }
-                }
-            } else {
-                // No match - flip cards back
-                lockBoard = true;
-                board.addClass("locked");
-                setTimeout(() => {
-                    flippedCards[0].removeClass("flipped");
-                    flippedCards[1].removeClass("flipped");
-                    flippedCards = [];
-                    lockBoard = false;
-                    board.removeClass("locked");
-                    
-                    // Switch turn only in multiplayer mode when no match
-                    if (isMultiplayer) {
-                        switchTurn();
-                    }
-                }, 1000);
-            }
-        }
-
-        function switchTurn() {
-            currentPlayer = currentPlayer === 1 ? 2 : 1;
-            $("#turn-display").text("PLAYER " + currentPlayer);
-        }
-
-        function updateScoreboard() {
-            $("#p1-score").text(scores[1]);
-            $("#p2-score").text(scores[2]);
-        }
-
-        function endMultiplayerGame() {
-            let message;
-            if (scores[1] > scores[2]) {
-                message = `PLAYER 1 WINS!\nP1: ${scores[1]} | P2: ${scores[2]}`;
-            } else if (scores[2] > scores[1]) {
-                message = `PLAYER 2 WINS!\nP2: ${scores[2]} | P1: ${scores[1]}`;
-            } else {
-                message = `DRAW!\nP1: ${scores[1]} | P2: ${scores[2]}`;
-            }
-            
-            setTimeout(() => {
-                alert("MISSION ACCOMPLISHED\n" + message);
-            }, 500);
+        if (flippedCards.length === 2) {
+            checkForMatch();
         }
     }
+
+    function checkForMatch() {
+        lockBoard = true;
+        let isMatch = flippedCards[0].data("value") === flippedCards[1].data("value");
+
+        if (isMatch) {
+            matchedPairs++;
+            if (isMultiplayer || isCPU) {
+                scores[currentPlayer]++;
+                updateScoreboard();
+                flippedCards = [];
+                lockBoard = false;
+
+                if (matchedPairs === 18) {
+                    endGame();
+                } else if (isCPU && currentPlayer === 2) {
+                    // Ha a CPU talált, vár egy kicsit és újra húz
+                    setTimeout(cpuTurn, 1000);
+                }
+            } else {
+                // Single player logic
+                flippedCards = [];
+                lockBoard = false;
+                if (matchedPairs === 18) endGame();
+            }
+        } else {
+            // Nincs találat
+            setTimeout(() => {
+                flippedCards[0].removeClass("flipped");
+                flippedCards[1].removeClass("flipped");
+                flippedCards = [];
+                
+                if (isMultiplayer || isCPU) {
+                    switchTurn();
+                }
+                lockBoard = false;
+            }, 1000);
+        }
+    }
+
+    function switchTurn() {
+        currentPlayer = currentPlayer === 1 ? 2 : 1;
+        let p2Name = isCPU ? "CPU" : "PLAYER 2";
+        $("#turn-display").text(currentPlayer === 1 ? "YOU" : p2Name);
+
+        // Ha CPU jön, indítjuk az automatikáját
+        if (isCPU && currentPlayer === 2) {
+            setTimeout(cpuTurn, 1000);
+        }
+    }
+
+    function cpuTurn() {
+        if (matchedPairs === 18) return;
+
+        // Keresünk két kártyát, ami még nincs kint
+        let availableCards = $(".card").not(".flipped");
+        if (availableCards.length < 2) return;
+
+        // Első választás
+        let firstIndex = Math.floor(Math.random() * availableCards.length);
+        let firstCard = $(availableCards[firstIndex]);
+        handleFlip(firstCard);
+
+        // Második választás (kicsit később, hogy látszódjon)
+        setTimeout(() => {
+            availableCards = $(".card").not(".flipped");
+            let secondIndex = Math.floor(Math.random() * availableCards.length);
+            let secondCard = $(availableCards[secondIndex]);
+            handleFlip(secondCard);
+        }, 800);
+    }
+
+    function updateScoreboard() {
+        $("#p1-score").text(scores[1]);
+        $("#p2-score").text(scores[2]);
+    }
+
+    function endGame() {
+        let message = "MISSION ACCOMPLISHED\n";
+        if (isMultiplayer || isCPU) {
+            let p2Name = isCPU ? "CPU" : "PLAYER 2";
+            if (scores[1] > scores[2]) message += "YOU WIN!";
+            else if (scores[2] > scores[1]) message += p2Name + " WINS!";
+            else message += "IT'S A DRAW!";
+        } else {
+            message += "Time: " + $("#timer-display").text();
+        }
+        alert(message);
+    }
+}
 
     // Cím, vissza a főmenübe
     $("#header").click(function () {
