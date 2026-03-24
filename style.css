@@ -184,7 +184,7 @@ body::before {
     object-fit: cover;
 }
 .disabled-cards {
-    pointer-events: none; /* Megakadályozza a kattintást */
+    pointer-events: none;
 }
 #game-board.locked .card-back {
     cursor: url(img/cursor/cursor_open.png), auto !important;
@@ -225,11 +225,11 @@ body::before {
 }
 
 .btn {
-    transition: width 0.2s ease; /* Minden szélességváltás sima lesz */
+    transition: width 0.2s ease;
 }
 
 .btn:hover {
-    width: 60vw !important; /* Automatikus animáció hoverkor */
+    width: 60vw !important;
 }
 
 /* Az aktív gomb stílusa */
