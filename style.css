@@ -19,16 +19,16 @@ html:active, body:active {
 
 body {
     font-family: MyFont;
-    margin: 0; /* Vegyük le a fix margót */
-    padding: 20px; /* Paddingot használjunk helyette */
+    margin: 0;
+    padding: 20px;
     color: var(--green);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-image: url(/img/bg.png);
+    background-image: url(./img/bg.png);
     background-repeat: repeat;
-    overflow: hidden; /* Megszünteti a görgetést */
+    overflow: hidden;
     box-sizing: border-box;
 }
 
@@ -36,13 +36,13 @@ body::before {
     content: "";
     position: fixed;
     inset: 0;
-    background: url(/img/Divine_Light_Border.webp) no-repeat center;
+    background: url(./img/Divine_Light_Border.webp) no-repeat center;
     background-size: 100vw 100vh;
     pointer-events: none;
 }
 
 #header {
-    flex-shrink: 0; /* Ne engedje összenyomni a fejlécet */
+    flex-shrink: 0;
     margin-bottom: 20px;
     display: flex;
     justify-content: center;
@@ -90,9 +90,10 @@ body::before {
     margin: 10px auto;
     box-sizing: border-box;
     width: 10vw;
-	height: 10vw;
-	filter: saturate(5);
-	transition: transform 0.2s ease, filter 0.2s ease;
+    height: 10vw;
+    filter: saturate(5);
+    transition: transform 0.2s ease, filter 0.2s ease;
+    cursor: url(img/cursor/cursor_open.png), auto;
 }
 
 .btn-start:hover {
@@ -100,37 +101,48 @@ body::before {
 	filter: saturate(1);
 }
 
-#player-indicator-div {
-	text-align: center;
-	justify-content: center;
+#status-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
 }
 
-#player-indicator {
-	margin: auto;
-	background-color: var(--purple);
-	color: var(--green);
-	width: 30vw;
-	font-size: 50px;
+.status-box {
+    background-color: var(--purple);
+    border: 3px solid var(--green);
+    padding: 10px 20px;
+    min-width: 150px;
+    text-align: center;
 }
 
-/* --- BOARD --- */
+.status-label {
+    margin: 0;
+    font-size: 14px;
+    color: white;
+    text-decoration: underline;
+}
+
+#mode-display, #timer-display {
+    margin: 5px 0 0 0;
+    font-size: 28px;
+    color: var(--green);
+    font-weight: bold;
+}
+/* Játéktér */
 
 #game-board {
     display: grid;
-    /* 9 oszlopos rács */
     grid-template-columns: repeat(9, 1fr); 
-    
-    /* A sorok magasságát is rögzíthetjük 4-re */
     grid-template-rows: repeat(4, 1fr);
     
     gap: 10px;
-    width: 60vw;       /* Szinte a teljes képernyőszélesség */
-    max-width: 1600px; /* Megállítjuk, hogy ne legyen túl nyúlánk nagy monitoron */
+    width: 60vw;
+    max-width: 1600px;
     margin: 20px auto;
 }
 
 .card {
-    /* Fontos, hogy a kártyák megőrizzék a négyzet alakjukat */
     aspect-ratio: 1 / 1; 
 }
 
@@ -139,10 +151,9 @@ body::before {
     width: 100%;
     height: 100%;
     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-style: preserve-3d; /* Ez engedi, hogy a gyerek elemek 3D-ben mozogjanak */
+    transform-style: preserve-3d;
 }
 
-/* Amikor ezt az osztályt rátesszük JS-sel, megfordul a lap */
 .card.flipped .card-inner {
     transform: rotateY(180deg);
 }
@@ -151,7 +162,7 @@ body::before {
     position: absolute;
     width: 100%;
     height: 100%;
-    backface-visibility: hidden; /* Ha a lap "háta" van felénk, legyen láthatatlan */
+    backface-visibility: hidden;
     border: 2px solid var(--green);
     display: flex;
     justify-content: center;
@@ -159,18 +170,72 @@ body::before {
     background-color: #000;
 }
 
-/* A hátulja (amit alapból látunk) */
 .card-back {
-    z-index: 2; /* Felül van az elején */
+    z-index: 2;
 }
 
-/* Az eleje (a számozott kép) */
 .card-front {
-    transform: rotateY(180deg); /* Eleve meg van fordítva, hogy a túloldalon legyen */
+    transform: rotateY(180deg);
 }
 
 .card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+.disabled-cards {
+    pointer-events: none; /* Megakadályozza a kattintást */
+}
+#game-board.locked .card-back {
+    cursor: url(img/cursor/cursor_open.png), auto !important;
+}
+/*Tooltips*/
+[data-tooltip] {
+    position: relative;
+}
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--purple);
+    color: var(--green);
+    padding: 8px 15px;
+    border: 3px solid var(--green);
+    font-size: 20px;
+    white-space: nowrap;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.start-wrapper::after {
+    bottom: 100%;
+}
+#header::after {
+    top: 110%;
+}
+[data-tooltip]:hover::after {
+    opacity: 1;
+}
+.start-wrapper {
+    display: inline-block;
+    position: relative;
+}
+
+.btn {
+    transition: width 0.2s ease; /* Minden szélességváltás sima lesz */
+}
+
+.btn:hover {
+    width: 60vw !important; /* Automatikus animáció hoverkor */
+}
+
+/* Az aktív gomb stílusa */
+.active-mode {
+    background-color: white !important;
+    color: var(--green) !important;
+    border: var(--green) 4px solid !important;
+    width: 60vw !important;
 }

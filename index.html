@@ -11,12 +11,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="header">
+    <div id="header" data-tooltip="Back to main menu">
         <p id="title">Cruelty Squad Themed Memory Game</p>
     </div>
     <div id="content">
         <div id="buttons">
-            <img class="btn-start" src="/img/btns/disabled_button.gif" alt="startbtn">
+            <div class="start-wrapper" data-tooltip="Start Game">
+                <img class="btn-start" src="./img/btns/disabled_button.gif" alt="startbtn">
+            </div>
             <div class="btn btn-single" id="single">SINGLEPLAYER</div>
             <div class="btn btn-cpu" id="cpu">VS CPU</div>
             <div class="btn btn-multi" id="multi">PLAYER VS PLAYER</div>
