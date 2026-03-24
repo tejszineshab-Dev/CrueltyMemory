@@ -223,3 +223,19 @@ body::before {
     display: inline-block;
     position: relative;
 }
+
+.btn {
+    transition: width 0.2s ease; /* Minden szélességváltás sima lesz */
+}
+
+.btn:hover {
+    width: 60vw !important; /* Automatikus animáció hoverkor */
+}
+
+/* Az aktív gomb stílusa */
+.active-mode {
+    background-color: white !important;
+    color: var(--green) !important;
+    border: var(--green) 4px solid !important;
+    width: 60vw !important;
+}

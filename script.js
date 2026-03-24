@@ -16,35 +16,20 @@ $(document).ready(function () {
     }
 
     //  Index oldal
-    if (mode === "none" || mode === null) {
-        $(".btn").hover(function () {
-            $(this).stop().animate({ width: '60vw' }, 100);
-        }, function () {
-            $(this).stop().animate({ width: '50vw' }, 100);
-        });
+    // Játékmód választás
+    $(".btn").click(function () {
+        gamemode = $(this).attr("id");
+        $(".btn").removeClass("active-mode"); // Összesről leveszi
+        $(this).addClass("active-mode");      // Erre ráteszi
+        $(".btn-start").attr("src", "img/btns/mission_start.png");
+    });
 
-        // Játékmód választás
-        $(".btn").click(function () {
-            gamemode = $(this).attr("id");
-            $(".btn-start").attr("src", "img/btns/mission_start.png");
-            
-            // Gombok színeinek resetelése és az aktív kiemelése
-            $(".btn").css({ backgroundColor: 'var(--green)', color: 'white', border: 'white 4px solid' });
-            $(this).css({ backgroundColor: 'white', color: 'var(--green)', border: 'var(--green) 4px solid' });
-        });
-
-        // Start gomb
-        $(".btn-start").click(function () { 
-            if (gamemode === "none") {
-                window.alert("Please select a gamemode!");
-            } else {
-                localStorage.setItem("selected_gamemode", gamemode);
-                $("#content").fadeOut(1000, function() {
-                    window.location.href = "game.html";
-                });
-            }
-        });
-    } 
+    // Start gomb
+    $(".btn-start").click(function () { 
+        if (!gamemode || gamemode === "none") return alert("Select gamemode!");
+        localStorage.setItem("selected_gamemode", gamemode);
+        $("#content").fadeOut(500, () => window.location.href = "game.html");
+    });
 
     // Játéktér, stb.
     if (mode === "single" || mode === "cpu" || mode === "multi") {
@@ -56,10 +41,6 @@ $(document).ready(function () {
     let cards = [];
     let flippedCards = [];
     let lockBoard = false;
-    
-    let timerStarted = false;
-    let seconds = 0;
-    let timerInterval;
     let matchedPairs = 0;
     
     // Módok meghatározása
@@ -70,13 +51,12 @@ $(document).ready(function () {
 
     // UI beállítása (Pontok és körök kijelzése)
     if (isMultiplayer || isCPU) {
-        $("#timer-display").parent().hide();
         let p2Label = isCPU ? "CPU" : "P2";
         
         $("#status-container").append(`
             <div class="status-box" id="turn-box">
                 <p class="status-label">TURN</p>
-                <p id="turn-display" style="margin: 5px 0 0 0; font-size: 28px; color: var(--green); font-weight: bold;">YOU</p>
+                <p id="turn-display" style="margin: 5px 0 0 0; font-size: 28px; color: var(--green); font-weight: bold;">PLAYER 1</p>
             </div>
             <div class="status-box">
                 <p class="status-label">YOUR SCORE</p>
@@ -163,7 +143,7 @@ $(document).ready(function () {
     function switchTurn() {
         currentPlayer = currentPlayer === 1 ? 2 : 1;
         let p2Name = isCPU ? "CPU" : "PLAYER 2";
-        $("#turn-display").text(currentPlayer === 1 ? "YOU" : p2Name);
+        $("#turn-display").text(currentPlayer === 1 ? "PLAYER 1" : p2Name);
 
         // Ha CPU jön, indítjuk az automatikáját
         if (isCPU && currentPlayer === 2) {
@@ -204,8 +184,6 @@ $(document).ready(function () {
             if (scores[1] > scores[2]) message += "YOU WIN!";
             else if (scores[2] > scores[1]) message += p2Name + " WINS!";
             else message += "IT'S A DRAW!";
-        } else {
-            message += "Time: " + $("#timer-display").text();
         }
         alert(message);
     }
